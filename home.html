@@ -1027,7 +1027,7 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
   <div class="wrap contact-inner">
     <div class="eyebrow reveal" style="justify-content:center;">Contact — Index 006</div>
     <h2 class="reveal reveal-delay-1">Let's build<br>something precise.</h2>
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=www.ren.nrs@gmail.com" class="contact-email reveal reveal-delay-2">www.ren.nrs@gmail.com</a>
+    <a href="mailto:www.ren.nrs@gmail.com" class="contact-email reveal reveal-delay-2" id="email-link">www.ren.nrs@gmail.com</a>
 
     <div class="contact-links reveal reveal-delay-3">
       <a href="#" target="_blank" rel="noopener">LinkedIn</a>
@@ -1045,6 +1045,12 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
 </footer>
 
 <script>
+  const emailLink = document.getElementById("email-link");
+
+  if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      emailLink.href =
+          "https://mail.google.com/mail/?view=cm&fs=1&to=www.ren.nrs@gmail.com";
+  }
 (function(){
   "use strict";
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
