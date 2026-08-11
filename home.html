@@ -370,7 +370,7 @@ header.scrolled{
   gap:32px;
   align-items:center;
   position:relative;
-  cursor:pointer;
+  cursor:default;
   transition:padding 0.45s var(--ease);
 }
 .project-item:last-child{border-bottom:1px solid var(--border-soft);}
@@ -381,16 +381,27 @@ header.scrolled{
 
 .project-thumb{
   aspect-ratio:16/10;
-  position:relative;overflow:hidden;
+  position:relative;
+  overflow:hidden;
   border:1px solid var(--border-soft);
-  justify-self:end;width:100%;max-width:340px;
+  justify-self:end;
+  width:100%;
+  max-width:340px;
 }
-.project-thumb .thumb-fill{
-  position:absolute;inset:0;
+
+.project-thumb img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
   transform:scale(1.08);
   transition:transform 1.1s var(--ease);
 }
-.project-item:hover .thumb-fill{transform:scale(1.18);}
+
+.project-item:hover .project-thumb img{
+  transform:scale(1.18);
+}
 .project-item:hover .project-main h3{transform:translateX(10px);color:var(--accent);}
 
 .thumb-1{background:radial-gradient(circle at 30% 30%, rgba(124,147,255,0.5), transparent 55%),radial-gradient(circle at 75% 70%, rgba(154,124,255,0.4), transparent 55%),linear-gradient(150deg,#141620,#0a0a0c);}
@@ -803,10 +814,17 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
           <div class="project-meta"><span>2025</span><span>·</span><span>UI/UX Design &amp; Web Development</span></div>
           <p class="project-desc" style="margin-top:14px;">I created this interactive vocabulary website as a personal gift for my English teacher, Miss Edith, after completing her course. Originally made for her Wave 3 class, the website continued to be used by later students, turning a small personal project into a resource that became part of her teaching.</p>
         </div>
-        <a href="https://www-ren.github.io/Projects/504-Essential-Words.html" class="project-thumb" aria-label="View Lumen case study">
-          <div class="thumb-fill thumb-1"></div>
-          <div class="thumb-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 17L17 7M9 7h8v8"/></svg></div>
-        </a>
+        <div class="project-thumb">
+          <img src="images/504-essential-words.png" alt="504 Essential Words website screenshot">
+        
+          <a href="https://www-ren.github.io/Projects/504-Essential-Words.html"
+             class="thumb-arrow"
+             aria-label="View 504 Essential Words project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M7 17L17 7M9 7h8v8"/>
+            </svg>
+          </a>
+        </div>
       </div>
 
       <div class="project-item reveal">
