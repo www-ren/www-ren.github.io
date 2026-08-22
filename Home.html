@@ -850,16 +850,20 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
   var railIndicator = document.getElementById('railIndicator');
   var railItems = railNav ? railNav.querySelectorAll('.rail-item') : [];
   function updateIndicator(id){
-    var target = null;
-    railItems.forEach(function(item){
-      var active = item.dataset.nav === id;
-      item.classList.toggle('active', active);
-      if(active) target = item;
-    });
-    if(target && railIndicator){
-      railIndicator.style.transform = 'translateY(' + target.offsetTop + 'px)';
-      railIndicator.style.height = target.offsetHeight + 'px';
-    }
+  const target = document.querySelector(`.rail-item[data-nav="${id}"]`);
+  if (!target || !railIndicator || !railNav) return;
+  
+    railItems.forEach(item =>
+      item.classList.toggle("active", item === target)
+    );
+  
+    const navRect = railNav.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+  
+    railIndicator.style.transform =
+      `translateY(${targetRect.top - navRect.top}px)`;
+  
+    railIndicator.style.height = `${targetRect.height}px`;
   }
 
   /* ---------- Panel switching (desktop) ---------- */
@@ -984,7 +988,13 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
   Object.keys(panels).forEach(function(k){ panels[k].classList.toggle('active', k === initial); });
   updateIndicator(initial);
   setTimeout(function(){ playReveal(panels[initial]); }, 60);
-  window.addEventListener('resize', function(){ updateIndicator(current); });
+  window.addEventListener("load", function () {
+    updateIndicator(current);
+  });
+  
+  window.addEventListener("resize", function () {
+    updateIndicator(current);
+  });
 
   /* ---------- Magnetic buttons ---------- */
   if(!reduceMotion){
