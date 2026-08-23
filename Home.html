@@ -236,7 +236,7 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
 /* ============================= ABOUT PANEL ============================= */
 .about-grid{display:grid;grid-template-columns:0.78fr 1.22fr;gap:56px;align-items:start;position:relative;}
 .portrait{
-  aspect-ratio:4/5;max-width:280px;position:relative;border:1px solid var(--border);border-radius:18px;overflow:hidden;
+  aspect-ratio:4/5;max-width:400px;position:relative;border:1px solid var(--border);border-radius:18px;overflow:hidden;
   background:radial-gradient(120% 100% at 20% 0%, rgba(124,147,255,0.22), transparent 60%),radial-gradient(120% 100% at 90% 100%, rgba(154,124,255,0.18), transparent 55%),linear-gradient(160deg, #14151a, #0a0b0d 70%);
 }
 .portrait::before{
@@ -267,32 +267,29 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
 /* ============================= PROJECTS PANEL ============================= */
 .project-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 .project-card{
-  position:relative;aspect-ratio:3/4;border-radius:16px;overflow:hidden;border:1px solid var(--border-soft);
+  position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--border-soft);
   background:#0b0c0f;transition:transform 0.5s var(--ease),border-color 0.5s var(--ease);
 }
 .project-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.22);}
-.project-card img{position: absolute;top: 18px;left: 50%;transform: translateX(-50%) scale(1);width: calc(100% - 36px);height: 46%;object-fit: contain;object-position: top center;z-index: 1;transition: transform 0.6s ease;}
-.project-card:hover img { transform: translateX(-50%) scale(1.08); }
-.thumb-1{background:radial-gradient(circle at 30% 30%, rgba(124,147,255,0.5), transparent 55%),radial-gradient(circle at 75% 70%, rgba(154,124,255,0.4), transparent 55%),linear-gradient(150deg,#141620,#0a0a0c);}
-.thumb-2{background:radial-gradient(circle at 70% 30%, rgba(95,185,255,0.42), transparent 55%),radial-gradient(circle at 25% 75%, rgba(124,147,255,0.32), transparent 55%),linear-gradient(150deg,#101318,#0a0a0c);}
-.thumb-3{background:radial-gradient(circle at 40% 65%, rgba(154,124,255,0.4), transparent 55%),radial-gradient(circle at 80% 20%, rgba(124,147,255,0.28), transparent 55%),linear-gradient(150deg,#12121a,#0a0a0c);}
-.thumb-4{background:radial-gradient(circle at 60% 40%, rgba(95,227,196,0.24), transparent 55%),radial-gradient(circle at 20% 80%, rgba(95,185,255,0.32), transparent 55%),linear-gradient(150deg,#0e1416,#0a0a0c);}
+.thumb-1{background:radial-gradient(circle at 30% 30%, rgba(124,147,255,0.15), transparent 55%),radial-gradient(circle at 75% 70%, rgba(154,124,255,0.1), transparent 55%),linear-gradient(150deg,#141620,#0a0a0c);}
+.thumb-2{background:radial-gradient(circle at 70% 30%, rgba(95,185,255,0.11), transparent 55%),radial-gradient(circle at 25% 75%, rgba(124,147,255,0.08), transparent 55%),linear-gradient(150deg,#101318,#0a0a0c);}
+.thumb-3{background:radial-gradient(circle at 40% 65%, rgba(154,124,255,0.10), transparent 55%),radial-gradient(circle at 80% 20%, rgba(124,147,255,0.06), transparent 55%),linear-gradient(150deg,#12121a,#0a0a0c);}
+.thumb-4{background:radial-gradient(circle at 60% 40%, rgba(95,227,196,0.05), transparent 55%),radial-gradient(circle at 20% 80%, rgba(95,185,255,0.08), transparent 55%),linear-gradient(150deg,#0e1416,#0a0a0c);}
 .project-card::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);background-size:16px 16px;pointer-events:none;}
-.project-scrim{position:absolute;inset:0;background:linear-gradient(to top, rgba(4,5,7,0.94) 0%, rgba(4,5,7,0.55) 38%, transparent 68%);display:flex;flex-direction:column;justify-content:flex-end;padding:16px;z-index:2;}
+.project-scrim{position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:20px;padding-top:44px;z-index:2;}
 .project-num{font-family:var(--font-mono);font-size:10.5px;color:var(--text-3);position:absolute;top:14px;left:16px;z-index:2;}
 .project-card h3{font-size:15px;font-weight:500;letter-spacing:-0.01em;margin-bottom:5px;line-height:1.2;}
 .project-meta{display:flex;gap:8px;font-family:var(--font-mono);font-size:9.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;flex-wrap:wrap;}
 .project-desc{
-  color:var(--text-2);font-size:11.5px;line-height:1.55;font-weight:300;max-height:0;opacity:0;overflow:hidden;
-  transition:max-height 0.5s var(--ease),opacity 0.4s var(--ease),margin 0.5s var(--ease);
+  color:var(--text-2);font-size:11.5px;line-height:1.55;font-weight:300;flex:1;margin-top:2px;
 }
-.project-card:hover .project-desc{max-height:120px;opacity:1;margin-top:2px;}
 .thumb-arrow{
   position:absolute;top:12px;right:12px;width:30px;height:30px;border:1px solid rgba(255,255,255,0.25);border-radius:50%;
   display:flex;align-items:center;justify-content:center;background:rgba(8,9,11,0.5);backdrop-filter:blur(6px);
-  opacity:0;transform:translate(-6px,6px);transition:all 0.4s var(--ease);z-index:3;
+  transition:border-color 0.4s var(--ease),background 0.4s var(--ease),transform 0.4s var(--ease);
+  z-index:3;
 }
-.project-card:hover .thumb-arrow{opacity:1;transform:translate(0,0);}
+.project-card:hover .thumb-arrow{border-color:var(--accent);transform:translate(2px,-2px);}
 .thumb-arrow svg{width:13px;height:13px;}
 
 /* ============================= CERTIFICATES PANEL ============================= */
@@ -603,13 +600,11 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
         </div>
 
         <div class="project-grid reveal">
+
           <div class="project-card">
             <span class="project-num">01</span>
-            <img src="images/504-essential-words.png" alt="504 Essential Words website screenshot" onerror="this.style.display='none'">
-            <div class="thumb-1" style="position:absolute;inset:0;z-index:-1;"></div>
-            <a href="https://www-ren.github.io/Projects/504-Essential-Words.html" class="thumb-arrow" aria-label="View 504 Essential Words project" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 17L17 7M9 7h8v8"/></svg>
-            </a>
+            <div class="thumb-1" style="position:absolute;inset:0;"></div>
+            <a href="https://www-ren.github.io/Projects/504-Essential-Words.html" class="thumb-arrow" aria-label="View 504 Essential Words project"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
             <div class="project-scrim">
               <h3>504 Essential Words</h3>
               <div class="project-meta"><span>2025</span><span>·</span><span>UI/UX &amp; Web Dev</span></div>
