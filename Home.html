@@ -206,7 +206,7 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
 .hero-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:32px;align-items:center;width:100%;}
 .hero-label-row{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
 .hero-coord{font-family:var(--font-mono);font-size:10.5px;color:var(--text-3);letter-spacing:0.08em;}
-.hero h1{font-size:clamp(38px,5.4vw,80px);margin-bottom:50px;}
+.hero h1{font-size:clamp(38px,5.4vw,80px);margin-bottom:24px;}
 .hero h1 .line{display:block;overflow:hidden;}
 .hero h1 .line span{display:inline-block;transform:translateY(112%);transition:transform 1s var(--ease);}
 .panel.active .hero h1 .line:nth-child(1) span{transition-delay:0.08s;}
@@ -216,6 +216,7 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
 .hero h1 .accent-text{color:transparent;-webkit-text-stroke:1.4px var(--text-1);}
 .hero-sub{max-width:460px;font-size:15.5px;line-height:1.7;color:var(--text-2);font-weight:300;margin-bottom:30px;}
 .hero-cta{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+#name{padding-bottom:50px;}
 
 .hero-visual{position:relative;height:min(46vh,420px);display:flex;align-items:center;justify-content:center;}
 .orb-wrap{position:relative;width:min(60%,320px);height:min(60%,320px);aspect-ratio:1;}
@@ -507,7 +508,7 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
               <span class="eyebrow" style="margin:0;">Portfolio — Index 001</span>
               <span class="hero-coord">41.7151° N / 44.7830° E</span>
             </div>
-            <h1>
+            <h1 id="name">
               <span class="line"><span>AREN NERSISYAN</span></span>
               <span class="line"><span class="accent-text">PORTFOLIO</span></span>
             </h1>
