@@ -317,6 +317,9 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
 .timeline-content .role{font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.09em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
 .timeline-content h3{font-size:15.5px;font-weight:500;margin-bottom:8px;letter-spacing:-0.01em;line-height:1.22;}
 .timeline-content p{font-size:11.5px;line-height:1.6;color:var(--text-2);font-weight:300;display:-webkit-box;-webkit-line-clamp:4;line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+.animated-link {position: relative;text-decoration: none;color: inherit;}
+.animated-link::after {content: "";position: absolute;left: 0;bottom: -2px;width: 100%;height: 2px;background: currentColor;transform: scaleX(0);transform-origin: left;transition: transform 0.3s ease;}
+.animated-link:hover::after {transform: scaleX(1);}
 
 /* ============================= CONTACT PANEL ============================= */
 .contact-inner{text-align:center;position:relative;z-index:2;margin:0 auto;}
@@ -721,8 +724,8 @@ a:focus-visible,button:focus-visible{outline:1px solid var(--accent);outline-off
             <div class="timeline-year">2026</div>
             <div class="timeline-content">
               <div class="role">Volunteer</div>
-              <h3><a href="https://www-ren.github.io/Notations%20Lab%20&%20Festival%20'26.pdf">Communication &amp; Teamwork Volunteer</a></h3>
-              <p>• Collaborated with a variety of teams on a community volunteering program, improving communication skills, assisting with group activities and supporting with organized events and workshops.</p>
+              <h3><a href="https://www-ren.github.io/Notations%20Lab%20&%20Festival%20'26.pdf" class="animated_link">Communication &amp; Teamwork Volunteer</a></h3>
+              <p>Collaborated with a variety of teams on a community volunteering program, improving communication skills, assisting with group activities and supporting with organized events and workshops.</p>
             </div>
           </div>
           <div class="timeline-item">
