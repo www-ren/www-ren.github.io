@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="color-scheme" content="dark">
+<title>Դպրոցական Ժամանակացույց</title>
+<style>
+  /* ===================== ROOT VARIABLES ===================== */
+  :root{
+    --bg-1:#0a0e1a;
+    --bg-2:#121729;
+    --glass-bg: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.12);
+    --text-main:#f2f4fb;
+    --text-dim:#9aa3bd;
+    --accent-lesson:#6c8cff;
+    --accent-lesson-2:#a78bfa;
+    --accent-break:#34d399;
+    --accent-break-2:#22c1a4;
+    --accent-off:#f59e0b;
+    --danger:#f87171;
+    --radius-lg:26px;
+    --radius-md:18px;
+    --radius-sm:12px;
+    --shadow-soft: 0 8px 32px rgba(0,0,0,0.45);
+    --ease: cubic-bezier(.4,0,.2,1);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  /*
+    ===== SCROLL-BUG FIX =====
+    Root cause: on Android Chrome, height:100% + background-attachment:fixed
+    ties the gradient to the *initial* layout viewport. When the address bar
+    auto-hides during a scroll gesture, the real viewport grows by ~50-60px
+    (~1cm) before layout catches up, briefly exposing the browser's default
+    white canvas below the sized html/body box.
+    Fix: give html/body a solid dark background-color as a fallback (so any
+    gap is dark, never white), and move the decorative gradient into a
+    `position:fixed; inset:0` pseudo-element on body. Fixed elements are
+    always sized to the *live* visual viewport by the browser itself, so the
+    gradient now tracks address-bar show/hide and dynamic-viewport resizes
+    perfectly instead of being pinned to a stale height. overscroll-behavior
+    also kills rubber-band bounce, which was the other source of the strip.
+  */
+  html{
+    height:100%;
+    background-color: var(--bg-1);
+    overscroll-behavior-y: none;
+  }
+  body{
+    min-height:100%;
+    min-height:100dvh;
+    background-color: var(--bg-1);
+    color: var(--text-main);
+    font-family: "Noto Sans Armenian","Segoe UI","Arial Unicode MS", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x:hidden;
+    overscroll-behavior-y: none;
+    position:relative;
+    touch-action: manipulation;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background:
+      radial-gradient(circle at 20% -10%, rgba(108,140,255,0.18), transparent 40%),
+      radial-gradient(circle at 90% 10%, rgba(167,139,250,0.14), transparent 45%),
+      linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    pointer-events:none;
+  }
+
+  /* Subtle floating background orbs for depth */
+  .bg-orb{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(80px);
+    opacity:0.35;
+    z-index:-1;
+    pointer-events:none;
+    will-change: transform;
+    animation: float 16s ease-in-out infinite;
+  }
+  .bg-orb.one{ width:280px; height:280px; background:var(--accent-lesson); top:-60px; left:-60px; }
+  .bg-orb.two{ width:260px; height:260px; background:var(--accent-break); bottom:-80px; right:-60px; animation-delay:4s; }
+
+  @keyframes float{
+    0%,100%{ transform: translate3d(0,0,0); }
+    50%{ transform: translate3d(14px,-24px,0); }
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding:
+      max(22px, calc(var(--safe-t) + 14px))
+      max(16px, calc(var(--safe-r) + 12px))
+      max(60px, calc(var(--safe-b) + 28px))
+      max(16px, calc(var(--safe-l) + 12px));
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  /* ===================== GLASS CARD BASE ===================== */
+  .glass{
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    /* promote to its own compositor layer: keeps the expensive
+       backdrop-filter blur from being recomputed on every scroll frame */
+    transform: translateZ(0);
+  }
+
+  /* ===================== HEADER ===================== */
+  .top-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding: 6px 4px;
+  }
+  .brand{
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:0.3px;
+    color: var(--text-dim);
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .shift-badge{
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight:700;
+    background: linear-gradient(135deg, var(--accent-lesson), var(--accent-lesson-2));
+    color:#fff;
+    box-shadow: 0 4px 18px rgba(108,140,255,0.35);
+    transition: background 0.5s var(--ease), box-shadow 0.5s var(--ease);
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .shift-badge.break-mode{
+    background: linear-gradient(135deg, var(--accent-break), var(--accent-break-2));
+    box-shadow: 0 4px 18px rgba(52,211,153,0.35);
+  }
+  .shift-badge.off-mode{
+    background: linear-gradient(135deg, var(--accent-off), #ef8f1e);
+    box-shadow: 0 4px 18px rgba(245,158,11,0.35);
+  }
+
+  /* ===================== CLOCK CARD ===================== */
+  .clock-card{
+    text-align:center;
+    padding: 30px 20px 26px;
+    animation: fadeIn 0.6s var(--ease);
+  }
+  .date-line{
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight:500;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  .clock{
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, #ffffff, #c7d0f0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height:1.1;
+  }
+
+  /* ===================== STATUS CARD ===================== */
+  .status-card{
+    padding: 26px 22px 24px;
+    position:relative;
+    overflow:hidden;
+  }
+  /* Glow pulse is done on a dedicated pseudo-layer and animates only
+     `opacity` (a compositor-only property), instead of animating
+     box-shadow blur radii directly on the card every frame. This removes
+     a full repaint of the card on every animation frame. */
+  .status-card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    opacity:0;
+    pointer-events:none;
+    will-change: opacity;
+    transition: opacity 0.5s var(--ease);
+  }
+  .status-card.glow-lesson::after{
+    opacity:1;
+    box-shadow: 0 0 0 1px rgba(108,140,255,0.35), 0 0 44px rgba(108,140,255,0.3);
+    animation: pulseGlow 2.6s ease-in-out infinite;
+  }
+  .status-card.glow-break::after{
+    opacity:1;
+    box-shadow: 0 0 0 1px rgba(52,211,153,0.35), 0 0 42px rgba(52,211,153,0.28);
+    animation: pulseGlow 2.6s ease-in-out infinite;
+  }
+  .status-card.glow-off::after{
+    opacity:1;
+    box-shadow: 0 0 0 1px rgba(245,158,11,0.25), 0 0 36px rgba(245,158,11,0.2);
+  }
+
+  @keyframes pulseGlow{
+    0%,100%{ opacity:0.6; }
+    50%{ opacity:1; }
+  }
+
+  .status-label{
+    font-size: 13px;
+    color: var(--text-dim);
+    text-transform:uppercase;
+    letter-spacing: 1px;
+    font-weight:600;
+    margin-bottom: 6px;
+  }
+  .status-title{
+    font-size: 25px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    line-height:1.3;
+    word-break: break-word;
+  }
+
+  .countdown-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom: 14px;
+  }
+  .countdown-caption{
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight:500;
+  }
+  .countdown-value{
+    font-size: 30px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+    white-space:nowrap;
+  }
+
+  .progress-wrap{
+    width:100%;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    overflow:hidden;
+    margin-top: 4px;
+  }
+  .progress-bar{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    background: linear-gradient(90deg, var(--accent-lesson), var(--accent-lesson-2));
+    transition: width 0.9s var(--ease), background 0.5s var(--ease);
+    will-change: width;
+  }
+  .progress-bar.break-fill{
+    background: linear-gradient(90deg, var(--accent-break), var(--accent-break-2));
+  }
+  .progress-percent{
+    text-align:right;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-weight:600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===================== SECTION TITLES ===================== */
+  .section-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding: 6px 4px 2px;
+    font-size: 15px;
+    font-weight:700;
+    color: var(--text-main);
+    letter-spacing: 0.2px;
+  }
+  .section-title .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--accent-lesson);
+    flex-shrink:0;
+  }
+  .section-title.b .dot{ background: var(--accent-break-2); }
+
+  /* ===================== TIMETABLE ===================== */
+  .timetable{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding: 13px 16px;
+    border-radius: var(--radius-md);
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: background-color 0.4s var(--ease), border-color 0.4s var(--ease),
+                box-shadow 0.4s var(--ease), transform 0.4s var(--ease), opacity 0.4s var(--ease);
+  }
+  .row.break-row{
+    padding: 9px 16px;
+    opacity:0.75;
+  }
+  .row .left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
+  .row .idx{
+    width:30px; height:30px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700;
+    color: var(--text-dim);
+    flex-shrink:0;
+    transition: background 0.4s var(--ease), color 0.4s var(--ease);
+  }
+  .row .name{
+    font-size:14.5px;
+    font-weight:600;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .row .time{
+    font-size: 13px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    font-weight:500;
+    flex-shrink:0;
+  }
+  .row.break-row .name{ font-size:13px; font-weight:500; color: var(--text-dim); }
+
+  /* Active lesson highlight */
+  .row.active{
+    background: linear-gradient(135deg, rgba(108,140,255,0.22), rgba(167,139,250,0.14));
+    border-color: rgba(108,140,255,0.45);
+    transform: scale(1.015);
+    box-shadow: 0 0 26px rgba(108,140,255,0.28);
+  }
+  .row.active .idx{
+    background: linear-gradient(135deg, var(--accent-lesson), var(--accent-lesson-2));
+    color:#fff;
+  }
+  .row.active.break-row{
+    background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(34,193,164,0.12));
+    border-color: rgba(52,211,153,0.4);
+    box-shadow: 0 0 26px rgba(52,211,153,0.24);
+    opacity:1;
+  }
+  .row.active.break-row .idx{
+    background: linear-gradient(135deg, var(--accent-break), var(--accent-break-2));
+    color:#fff;
+  }
+  .row.done{
+    opacity:0.4;
+  }
+
+  /* ===================== FOOTER ===================== */
+  .footer-note{
+    text-align:center;
+    font-size: 12px;
+    color: var(--text-dim);
+    padding: 10px 0 0;
+    opacity:0.7;
+  }
+
+  @keyframes fadeIn{
+    from{ opacity:0; transform: translateY(8px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  /* Respect reduced-motion preference for battery / comfort */
+  @media (prefers-reduced-motion: reduce){
+    .bg-orb, .status-card::after, .clock-card{ animation: none !important; }
+    .row, .shift-badge, .progress-bar{ transition-duration: 0.01ms !important; }
+  }
+
+  /* ===================== RESPONSIVE (tablet / desktop) ===================== */
+  @media (min-width: 640px){
+    .app{ max-width: 620px; padding-top: 40px; }
+    .clock{ font-size: 68px; }
+    .status-title{ font-size: 28px; }
+  }
+  @media (min-width: 1024px){
+    .app{ max-width: 760px; }
+  }
+
+  /* Very small phones: keep the clock from crowding the edges */
+  @media (max-width: 340px){
+    .clock{ font-size: 46px; }
+    .status-title{ font-size: 21px; }
+    .countdown-value{ font-size: 25px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-orb one"></div>
+  <div class="bg-orb two"></div>
+
+  <div class="app">
+
+    <!-- ===== Top bar ===== -->
+    <div class="top-bar">
+      <div class="brand">Դպրոցական Ժամանակացույց</div>
+      <div class="shift-badge" id="shiftBadge">—</div>
+    </div>
+
+    <!-- ===== Clock card ===== -->
+    <div class="glass clock-card">
+      <div class="date-line" id="dateLine">—</div>
+      <div class="clock" id="clock">00:00:00</div>
+    </div>
+
+    <!-- ===== Status card (current lesson / break / off school) ===== -->
+    <div class="glass status-card" id="statusCard">
+      <div class="status-label" id="statusLabel">Ընթացիկ դաս</div>
+      <div class="status-title" id="statusTitle">Բեռնվում է...</div>
+
+      <div class="countdown-row">
+        <div class="countdown-caption" id="countdownCaption">Մնացել է</div>
+        <div class="countdown-value" id="countdownValue">00:00:00</div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="progress-percent" id="progressPercent">0%</div>
+    </div>
+
+    <!-- ===== Timetable Ա հերթ ===== -->
+    <div class="section-title a">
+      <span class="dot"></span> Ա հերթ
+    </div>
+    <div class="timetable" id="timetableA"></div>
+
+    <!-- ===== Timetable Բ հերթ ===== -->
+    <div class="section-title b">
+      <span class="dot"></span> Բ հերթ
+    </div>
+    <div class="timetable" id="timetableB"></div>
+
+    <div class="footer-note">Թարմացվում է ամեն վայրկյան</div>
+
+  </div>
+
+<script>
+/* =====================================================================
+   ARMENIAN SCHOOL SCHEDULE — CORE LOGIC
+   Edit the PERIODS array below to change lesson / break times.
+   ===================================================================== */
+
+// ---- Full ordered list of periods across both shifts (24h, "HH:MM") ----
+const PERIODS = [
+  { shift:'Ա', type:'lesson', num:1, start:'08:30', end:'09:15' },
+  { shift:'Ա', type:'break',        start:'09:15', end:'09:20' },
+  { shift:'Ա', type:'lesson', num:2, start:'09:20', end:'10:05' },
+  { shift:'Ա', type:'break',        start:'10:05', end:'10:10' },
+  { shift:'Ա', type:'lesson', num:3, start:'10:10', end:'10:55' },
+  { shift:'Ա', type:'break',        start:'10:55', end:'11:05' },
+  { shift:'Ա', type:'lesson', num:4, start:'11:05', end:'11:50' },
+  { shift:'Ա', type:'break',        start:'11:50', end:'11:55' },
+  { shift:'Ա', type:'lesson', num:5, start:'11:55', end:'12:40' },
+  { shift:'Ա', type:'break',        start:'12:40', end:'12:45' },
+  { shift:'Ա', type:'lesson', num:6, start:'12:45', end:'13:30' },
+  { shift:'Ա', type:'break',        start:'13:30', end:'13:35' },
+  { shift:'Ա', type:'lesson', num:7, start:'13:35', end:'14:20' },
+  { shift:'transition', type:'break', start:'14:20', end:'14:25' }, // shift changeover
+  { shift:'Բ', type:'lesson', num:1, start:'14:25', end:'15:10' },
+  { shift:'Բ', type:'break',        start:'15:10', end:'15:15' },
+  { shift:'Բ', type:'lesson', num:2, start:'15:15', end:'16:00' },
+  { shift:'Բ', type:'break',        start:'16:00', end:'16:05' },
+  { shift:'Բ', type:'lesson', num:3, start:'16:05', end:'16:50' },
+  { shift:'Բ', type:'break',        start:'16:50', end:'17:00' },
+  { shift:'Բ', type:'lesson', num:4, start:'17:00', end:'17:45' },
+  { shift:'Բ', type:'break',        start:'17:45', end:'17:50' },
+  { shift:'Բ', type:'lesson', num:5, start:'17:50', end:'18:35' },
+  { shift:'Բ', type:'break',        start:'18:35', end:'18:40' },
+  { shift:'Բ', type:'lesson', num:6, start:'18:40', end:'19:25' },
+  { shift:'Բ', type:'break',        start:'19:25', end:'19:30' },
+  { shift:'Բ', type:'lesson', num:7, start:'19:30', end:'20:15' }
+];
+
+const WEEKDAYS = ['Կիրակի','Երկուշաբթի','Երեքշաբթի','Չորեքշաբթի','Հինգշաբթի','Ուրբաթ','Շաբաթ'];
+const MONTHS = ['Հունվար','Փետրվար','Մարտ','Ապրիլ','Մայիս','Հունիս','Հուլիս','Օգոստոս','Սեպտեմբեր','Հոկտեմբեր','Նոյեմբեր','Դեկտեմբեր'];
+
+// ---- Helpers ----
+function pad(n){ return n < 10 ? '0' + n : String(n); }
+
+function timeToSec(t){
+  const [h,m] = t.split(':').map(Number);
+  return h*3600 + m*60;
+}
+
+function formatDuration(totalSec){
+  totalSec = Math.max(0, Math.round(totalSec));
+  const h = Math.floor(totalSec/3600);
+  const m = Math.floor((totalSec%3600)/60);
+  const s = totalSec%60;
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+
+// ---- Precompute seconds once instead of re-parsing "HH:MM" strings
+//      every single tick (was happening up to ~80x per second before). ----
+PERIODS.forEach(p => {
+  p.startSec = timeToSec(p.start);
+  p.endSec = timeToSec(p.end);
+});
+
+const FIRST_START_SEC = PERIODS[0].startSec;
+const LAST_END_SEC = PERIODS[PERIODS.length-1].endSec;
+const PERIOD_COUNT = PERIODS.length;
+
+// ---- DOM refs ----
+const clockEl = document.getElementById('clock');
+const dateLineEl = document.getElementById('dateLine');
+const shiftBadgeEl = document.getElementById('shiftBadge');
+const statusCardEl = document.getElementById('statusCard');
+const statusLabelEl = document.getElementById('statusLabel');
+const statusTitleEl = document.getElementById('statusTitle');
+const countdownCaptionEl = document.getElementById('countdownCaption');
+const countdownValueEl = document.getElementById('countdownValue');
+const progressBarEl = document.getElementById('progressBar');
+const progressPercentEl = document.getElementById('progressPercent');
+const timetableAEl = document.getElementById('timetableA');
+const timetableBEl = document.getElementById('timetableB');
+
+// Row elements + their per-row cells, cached once so `update()` never has
+// to touch the DOM tree or re-query the document on every tick.
+let rowEls = [];
+
+// ---- Build static timetable rows once, then just toggle classes each tick ----
+function buildTimetable(){
+  const fragA = document.createDocumentFragment();
+  const fragB = document.createDocumentFragment();
+  rowEls = new Array(PERIOD_COUNT);
+
+  PERIODS.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'row' + (p.type === 'break' ? ' break-row' : '');
+
+    const left = document.createElement('div');
+    left.className = 'left';
+
+    const idx = document.createElement('div');
+    idx.className = 'idx';
+    idx.textContent = p.type === 'lesson' ? p.num : '⋯';
+
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = p.type === 'lesson' ? `Դաս ${p.num}` : 'Ընդմիջում';
+
+    left.appendChild(idx);
+    left.appendChild(name);
+
+    const time = document.createElement('div');
+    time.className = 'time';
+    time.textContent = `${p.start}–${p.end}`;
+
+    row.appendChild(left);
+    row.appendChild(time);
+
+    rowEls[i] = row;
+
+    if (p.shift === 'Բ' || p.shift === 'transition') {
+      fragB.appendChild(row);
+    } else {
+      fragA.appendChild(row);
+    }
+  });
+
+  // Single DOM write per table instead of N individual appendChild calls
+  // hitting a live tree.
+  timetableAEl.appendChild(fragA);
+  timetableBEl.appendChild(fragB);
+}
+
+// ---- Main update tick ----
+function update(){
+  const now = new Date();
+  const h = now.getHours(), mi = now.getMinutes(), s = now.getSeconds();
+  const nowSec = h*3600 + mi*60 + s;
+
+  // Clock
+  clockEl.textContent = `${pad(h)}:${pad(mi)}:${pad(s)}`;
+
+  // Date (only really needs updating once a day, but this is cheap enough
+  // that recomputing it is not worth the extra bookkeeping)
+  dateLineEl.textContent = `${WEEKDAYS[now.getDay()]}, ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+
+  let currentIndex = -1;
+  let mode = ''; // 'before' | 'lesson' | 'break' | 'after'
+  let current = null;
+
+  if (nowSec < FIRST_START_SEC) {
+    mode = 'before';
+  } else if (nowSec >= LAST_END_SEC) {
+    mode = 'after';
+  } else {
+    for (let i = 0; i < PERIOD_COUNT; i++) {
+      const p = PERIODS[i];
+      if (nowSec >= p.startSec && nowSec < p.endSec) { currentIndex = i; break; }
+    }
+    if (currentIndex !== -1) {
+      current = PERIODS[currentIndex];
+      mode = current.type; // 'lesson' or 'break'
+    }
+  }
+
+  // ---- Shift badge ----
+  let shiftLabel = '—';
+  let badgeClass = '';
+  if (mode === 'before') {
+    shiftLabel = 'Ա հերթ';
+    badgeClass = 'off-mode';
+  } else if (mode === 'after') {
+    shiftLabel = 'Դասերն ավարտված են';
+    badgeClass = 'off-mode';
+  } else if (current) {
+    const sh = current.shift === 'transition' ? 'Բ' : current.shift;
+    shiftLabel = `${sh} հերթ`;
+    badgeClass = current.type === 'break' ? 'break-mode' : '';
+  }
+  shiftBadgeEl.textContent = shiftLabel;
+  shiftBadgeEl.className = 'shift-badge ' + badgeClass;
+
+  // ---- Status card content ----
+  statusCardEl.classList.remove('glow-lesson','glow-break','glow-off');
+  progressBarEl.classList.remove('break-fill');
+
+  if (mode === 'before') {
+    statusLabelEl.textContent = 'Կարգավիճակ';
+    statusTitleEl.textContent = 'Դպրոցը դեռ չի սկսվել';
+    countdownCaptionEl.textContent = 'Հաջորդ դասը սկսվում է';
+    const remaining = FIRST_START_SEC - nowSec;
+    countdownValueEl.textContent = formatDuration(remaining);
+    statusCardEl.classList.add('glow-off');
+    progressBarEl.style.width = '0%';
+    progressPercentEl.textContent = '0%';
+
+  } else if (mode === 'after') {
+    statusLabelEl.textContent = 'Կարգավիճակ';
+    statusTitleEl.textContent = 'Դպրոցն ավարտվել է';
+    countdownCaptionEl.textContent = 'Հաջորդ դասը սկսվում է';
+    const remaining = (24*3600 - nowSec) + FIRST_START_SEC;
+    countdownValueEl.textContent = formatDuration(remaining);
+    statusCardEl.classList.add('glow-off');
+    progressBarEl.style.width = '100%';
+    progressPercentEl.textContent = '100%';
+
+  } else if (current) {
+    const total = current.endSec - current.startSec;
+    const elapsed = nowSec - current.startSec;
+    const percent = Math.min(100, Math.max(0, (elapsed/total)*100));
+    const remaining = current.endSec - nowSec;
+
+    if (current.type === 'lesson') {
+      statusLabelEl.textContent = 'Ընթացիկ դաս';
+      statusTitleEl.textContent = `Դաս ${current.num}`;
+      countdownCaptionEl.textContent = 'Մնացել է';
+      statusCardEl.classList.add('glow-lesson');
+    } else {
+      statusLabelEl.textContent = 'Կարգավիճակ';
+      statusTitleEl.textContent = 'Ընդմիջում';
+      countdownCaptionEl.textContent = 'Հաջորդ դասը սկսվում է';
+      statusCardEl.classList.add('glow-break');
+      progressBarEl.classList.add('break-fill');
+    }
+
+    countdownValueEl.textContent = formatDuration(remaining);
+    progressBarEl.style.width = percent.toFixed(1) + '%';
+    progressPercentEl.textContent = Math.round(percent) + '%';
+  }
+
+  // ---- Highlight active row in timetable (uses cached elements, no
+  //      querySelectorAll / dataset reads on the hot path) ----
+  for (let i = 0; i < PERIOD_COUNT; i++) {
+    const row = rowEls[i];
+    if (i === currentIndex) {
+      if (!row.classList.contains('active')) row.classList.add('active');
+      if (row.classList.contains('done')) row.classList.remove('done');
+    } else {
+      if (row.classList.contains('active')) row.classList.remove('active');
+      const shouldBeDone = PERIODS[i].endSec <= nowSec;
+      if (shouldBeDone && !row.classList.contains('done')) row.classList.add('done');
+      if (!shouldBeDone && row.classList.contains('done')) row.classList.remove('done');
+    }
+  }
+}
+
+// ---- Init ----
+buildTimetable();
+update();
+
+// Self-correcting scheduler: instead of a plain setInterval(update, 1000)
+// (which drifts and can double-fire relative to the wall clock), align
+// each tick to the next real second boundary. Same one-update-per-second
+// behaviour, just accurate and independent of accumulated timer drift.
+function scheduleNextTick(){
+  const delay = 1000 - (Date.now() % 1000);
+  setTimeout(() => {
+    update();
+    scheduleNextTick();
+  }, delay);
+}
+scheduleNextTick();
+
+// Pause work while the tab/screen is hidden (locked phone, backgrounded
+// app) and immediately resync the instant it becomes visible again —
+// saves battery/CPU and avoids a stale display after the phone wakes up.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) update();
+});
+</script>
+
+</body>
+</html>
