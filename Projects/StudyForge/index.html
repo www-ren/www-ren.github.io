@@ -801,7 +801,7 @@ const FAQS = [
    ========================================================= */
 const API = {
   async generateQuiz(payload){
-    const res = await fetch('/api/generate-quiz', {
+    const res = await fetch('https://backend-jcli.onrender.com/api/generate-quiz', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload)
@@ -813,7 +813,7 @@ const API = {
     return data;
   },
   async checkAnswer(payload){
-    const res = await fetch('/api/check-answer', {
+    const res = await fetch('https://backend-jcli.onrender.com/api/check-answer', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload)
@@ -828,7 +828,7 @@ const API = {
     return data.isCorrect;
   },
   async generateFlashcards(payload){
-    const res = await fetch('/api/generate-flashcards', {
+    const res = await fetch('https://backend-jcli.onrender.com/api/generate-flashcards', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload)
