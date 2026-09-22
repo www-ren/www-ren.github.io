@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyForge — AI Study Platform</title>
+<style>
+  :root{
+    --bg:#0b0f1a;
+    --bg-soft:#111629;
+    --card:#161c33;
+    --card-2:#1c2340;
+    --border:#2a3157;
+    --text:#f1f3fb;
+    --text-dim:#a3aac7;
+    --text-faint:#6b7296;
+    --accent:#7c6cff;
+    --accent-2:#4fd1c5;
+    --accent-grad:linear-gradient(135deg,#7c6cff 0%,#4fd1c5 100%);
+    --danger:#ff6b6b;
+    --success:#4fd18d;
+    --warn:#ffc65c;
+    --radius:16px;
+    --radius-sm:10px;
+    --shadow:0 10px 40px rgba(0,0,0,0.35);
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(ellipse at top,#141a30 0%,var(--bg) 55%);
+    color:var(--text);
+    min-height:100vh;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  .hidden{display:none !important;}
+  .container{max-width:1100px;margin:0 auto;padding:0 24px;}
+
+  /* NAV */
+  .navbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,15,26,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{
+    max-width:1100px;margin:0 auto;padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .logo{font-weight:800;font-size:20px;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+  .logo-mark{width:28px;height:28px;border-radius:8px;background:var(--accent-grad);display:inline-flex;align-items:center;justify-content:center;font-size:14px;}
+  .nav-links{display:flex;gap:4px;align-items:center;}
+  .nav-links button{
+    background:transparent;border:none;color:var(--text-dim);
+    font-size:14px;padding:8px 14px;border-radius:8px;cursor:pointer;
+    transition:all .15s ease;
+  }
+  .nav-links button:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+  .nav-links button.active{color:var(--text);background:rgba(255,255,255,0.08);}
+  .btn{
+    border:none;cursor:pointer;font-weight:600;border-radius:10px;
+    padding:11px 20px;font-size:14px;transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--accent-grad);color:#0b0f1a;box-shadow:0 6px 20px rgba(124,108,255,0.35);}
+  .btn-primary:hover{box-shadow:0 8px 26px rgba(124,108,255,0.5);}
+  .btn-secondary{background:var(--card-2);color:var(--text);border:1px solid var(--border);}
+  .btn-secondary:hover{background:#232a4d;}
+  .btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border);}
+  .btn-ghost:hover{color:var(--text);}
+  .btn-danger{background:rgba(255,107,107,0.12);color:var(--danger);border:1px solid rgba(255,107,107,0.35);}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .btn-block{width:100%;}
+
+  section{padding:80px 0;}
+  .eyebrow{color:var(--accent-2);font-weight:700;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;}
+  h1{font-size:52px;line-height:1.08;margin:16px 0;letter-spacing:-1.5px;}
+  h2{font-size:32px;letter-spacing:-0.8px;margin:0 0 8px;}
+  .sub{color:var(--text-dim);font-size:18px;max-width:640px;}
+  .hero{text-align:center;padding:100px 0 60px;}
+  .hero .sub{margin:0 auto 32px;}
+  .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px;}
+  .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+  @media(max-width:800px){.grid-3{grid-template-columns:1fr;} .grid-2{grid-template-columns:1fr;} h1{font-size:36px;} .hero{padding:60px 0 40px;}}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:28px;
+  }
+  .step-card{text-align:left;}
+  .step-num{
+    width:36px;height:36px;border-radius:50%;background:var(--accent-grad);
+    color:#0b0f1a;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:16px;
+  }
+  .feature-card h3{margin:12px 0 6px;font-size:17px;}
+  .feature-card p{color:var(--text-dim);font-size:14px;margin:0;}
+  .feature-icon{font-size:26px;}
+
+  .example-box{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:32px;margin-top:32px;box-shadow:var(--shadow);
+  }
+  .example-tag{display:inline-block;background:rgba(79,209,197,0.12);color:var(--accent-2);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:16px;}
+  .example-q{font-size:18px;font-weight:600;margin-bottom:16px;}
+  .example-choice{
+    padding:12px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;color:var(--text-dim);font-size:14px;
+  }
+  .example-choice.correct{border-color:var(--success);color:var(--success);background:rgba(79,209,141,0.08);}
+
+  .faq-item{border-bottom:1px solid var(--border);padding:18px 0;}
+  .faq-q{font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+  .faq-a{color:var(--text-dim);margin-top:10px;font-size:14px;display:none;line-height:1.6;}
+  .faq-item.open .faq-a{display:block;}
+  .faq-item.open .faq-arrow{transform:rotate(180deg);}
+  .faq-arrow{transition:transform .15s ease;color:var(--text-faint);}
+
+  footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--text-faint);font-size:13px;}
+
+  /* DASHBOARD */
+  .page-header{padding:48px 0 8px;}
+  .page-header h2{margin-bottom:4px;}
+  .page-header p{color:var(--text-dim);margin:0;}
+
+  textarea{
+    width:100%;background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);
+    color:var(--text);padding:16px;font-size:15px;font-family:inherit;resize:vertical;min-height:180px;
+  }
+  textarea:focus, input:focus, select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  input[type=text]{
+    width:100%;background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);
+    color:var(--text);padding:12px 14px;font-size:14px;font-family:inherit;
+  }
+  label.field-label{font-size:13px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:8px;margin-top:20px;}
+  .option-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .option-pill{
+    padding:9px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-soft);
+    color:var(--text-dim);font-size:13px;cursor:pointer;transition:all .12s ease;user-select:none;
+  }
+  .option-pill.selected{background:var(--accent-grad);color:#0b0f1a;border-color:transparent;font-weight:700;}
+  .option-pill:hover:not(.selected){border-color:var(--accent);color:var(--text);}
+  .config-card{margin-top:24px;}
+  .error-banner{
+    background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.4);color:#ffb3b3;
+    padding:14px 18px;border-radius:var(--radius-sm);margin-top:16px;font-size:14px;display:flex;gap:10px;align-items:flex-start;
+  }
+  .info-banner{
+    background:rgba(79,209,197,0.08);border:1px solid rgba(79,209,197,0.3);color:var(--accent-2);
+    padding:12px 16px;border-radius:var(--radius-sm);margin-top:16px;font-size:13px;
+  }
+
+  .loading-overlay{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:60px 20px;gap:16px;
+  }
+  .spinner{
+    width:44px;height:44px;border-radius:50%;border:4px solid var(--border);border-top-color:var(--accent);
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-overlay p{color:var(--text-dim);font-size:14px;}
+
+  /* QUIZ */
+  .quiz-wrap{max-width:720px;margin:0 auto;}
+  .progress-bar-track{width:100%;height:8px;background:var(--bg-soft);border-radius:20px;overflow:hidden;border:1px solid var(--border);}
+  .progress-bar-fill{height:100%;background:var(--accent-grad);transition:width .3s ease;}
+  .quiz-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--text-dim);margin-bottom:10px;}
+  .question-card{margin-top:24px;}
+  .question-text{font-size:20px;font-weight:600;margin-bottom:24px;line-height:1.4;}
+  .choice-btn{
+    display:block;width:100%;text-align:left;padding:16px 18px;margin-bottom:12px;
+    background:var(--bg-soft);border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    color:var(--text);font-size:15px;cursor:pointer;transition:all .12s ease;
+  }
+  .choice-btn:hover:not(:disabled){border-color:var(--accent);}
+  .choice-btn.selected{border-color:var(--accent);background:rgba(124,108,255,0.12);}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{border-color:var(--success);background:rgba(79,209,141,0.12);color:var(--success);}
+  .choice-btn.incorrect{border-color:var(--danger);background:rgba(255,107,107,0.12);color:var(--danger);}
+  .quiz-actions{display:flex;justify-content:space-between;margin-top:28px;}
+  .toggle-row{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:14px;font-size:13px;color:var(--text-dim);}
+  .switch{position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;position:absolute;}
+  .switch .slider{position:absolute;inset:0;background:var(--bg-soft);border:1px solid var(--border);border-radius:22px;cursor:pointer;transition:all .15s ease;}
+  .switch .slider::before{content:"";position:absolute;height:14px;width:14px;left:3px;top:3px;background:var(--text-dim);border-radius:50%;transition:all .15s ease;}
+  .switch input:checked + .slider{background:var(--accent);border-color:var(--accent);}
+  .switch input:checked + .slider::before{transform:translateX(16px);background:#fff;}
+  .switch input:focus-visible + .slider{outline:2px solid var(--accent);outline-offset:2px;}
+  .answer-feedback{margin-top:20px;padding:14px 18px;border-radius:var(--radius-sm);font-size:14px;line-height:1.5;border:1px solid var(--border);}
+  .answer-feedback.correct{background:rgba(79,209,141,0.08);border-color:rgba(79,209,141,0.4);}
+  .answer-feedback.incorrect{background:rgba(255,107,107,0.08);border-color:rgba(255,107,107,0.4);}
+  .answer-feedback.error{background:rgba(255,107,107,0.10);border-color:rgba(255,107,107,0.4);color:var(--danger);}
+  .answer-feedback .fb-title{font-weight:700;margin-bottom:6px;}
+  .answer-feedback.correct .fb-title{color:var(--success);}
+  .answer-feedback.incorrect .fb-title{color:var(--danger);}
+  .answer-feedback .fb-line{color:var(--text-dim);margin-top:4px;}
+  .answer-feedback .fb-line b{color:var(--text);}
+
+  /* RESULTS */
+  .score-hero{text-align:center;padding:40px 0;}
+  .score-big{font-size:64px;font-weight:800;background:var(--accent-grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .score-pct{font-size:22px;color:var(--text-dim);margin-top:4px;}
+  .concept-row{
+    display:flex;justify-content:space-between;align-items:center;padding:14px 18px;
+    background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;
+  }
+  .concept-tag{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;}
+  .concept-tag.strong{background:rgba(79,209,141,0.12);color:var(--success);}
+  .concept-tag.weak{background:rgba(255,107,107,0.12);color:var(--danger);}
+  .review-item{background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:14px;}
+  .review-item .badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;margin-bottom:10px;display:inline-block;}
+  .badge.correct{background:rgba(79,209,141,0.15);color:var(--success);}
+  .badge.incorrect{background:rgba(255,107,107,0.15);color:var(--danger);}
+  .review-item .ans-line{font-size:13px;color:var(--text-dim);margin-top:6px;}
+  .review-item .ans-line b{color:var(--text);}
+  .review-item .explain{font-size:13px;color:var(--text-faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+  .results-actions{display:flex;gap:14px;flex-wrap:wrap;margin:32px 0;}
+
+  /* FLASHCARDS */
+  .flash-wrap{max-width:560px;margin:0 auto;text-align:center;}
+  .flashcard-scene{perspective:1400px;height:320px;margin:32px 0;}
+  .flashcard{
+    position:relative;width:100%;height:100%;transform-style:preserve-3d;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);cursor:pointer;
+  }
+  .flashcard.flipped{transform:rotateY(180deg);}
+  .flash-face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);
+    display:flex;align-items:center;justify-content:center;padding:32px;
+    border:1px solid var(--border);box-shadow:var(--shadow);font-size:19px;font-weight:600;
+  }
+  .flash-front{background:var(--card);}
+  .flash-back{background:var(--card-2);transform:rotateY(180deg);color:var(--accent-2);font-weight:500;font-size:16px;}
+  .flash-controls{display:flex;justify-content:center;gap:14px;align-items:center;}
+  .flash-index{color:var(--text-dim);font-size:14px;min-width:70px;}
+
+  /* HISTORY */
+  .history-item{
+    display:flex;justify-content:space-between;align-items:center;padding:18px 22px;
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;flex-wrap:wrap;gap:10px;
+  }
+  .history-item .topic{font-weight:600;}
+  .history-item .date{color:var(--text-faint);font-size:13px;}
+  .history-score{font-weight:700;font-size:18px;}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--text-dim);}
+  .empty-state .icon{font-size:40px;margin-bottom:12px;}
+
+  /* PRICING */
+  .price-card{position:relative;}
+  .price-card.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+  .price-tag{font-size:36px;font-weight:800;margin:12px 0;}
+  .price-tag span{font-size:14px;color:var(--text-dim);font-weight:400;}
+  .price-list{list-style:none;padding:0;margin:20px 0;}
+  .price-list li{padding:8px 0;color:var(--text-dim);font-size:14px;display:flex;gap:8px;}
+  .not-connected{font-size:12px;color:var(--warn);background:rgba(255,198,92,0.1);padding:6px 10px;border-radius:8px;margin-top:14px;display:inline-block;}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--card-2);border:1px solid var(--border);padding:12px 20px;border-radius:10px;
+    font-size:14px;box-shadow:var(--shadow);z-index:200;
+  }
+
+  /* =========================================================
+     RESPONSIVE / MOBILE
+     Everything below only affects narrow screens or touch
+     devices. The desktop layout above is left untouched.
+     ========================================================= */
+
+  /* Background: never tile/cut when the page is narrow or scrolls */
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  body{
+    background-color:var(--bg);
+    background-repeat:no-repeat;
+    min-height:100vh;
+    min-height:100dvh;
+  }
+
+  /* Hamburger button (hidden on desktop) */
+  .nav-toggle{
+    display:none;
+    width:42px;height:42px;padding:0;flex-shrink:0;
+    background:transparent;border:1px solid var(--border);border-radius:10px;
+    color:var(--text);cursor:pointer;
+    flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .nav-toggle:hover{background:rgba(255,255,255,0.05);}
+  .nav-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .nav-toggle span{
+    display:block;width:18px;height:2px;border-radius:2px;background:currentColor;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+
+  #view-quiz{
+    margin-top: 15px;
+  }
+
+  /* Touch devices: 16px inputs stop iOS from zooming the page on focus */
+  @media (pointer:coarse){
+    textarea, input[type=text]{font-size:16px;}
+  }
+
+  /* ---------- Phones & small tablets: nav becomes a hamburger menu ---------- */
+  @media (max-width:640px){
+    .nav-inner{padding:10px 16px;}
+    .nav-toggle{display:inline-flex;}
+    .nav-links{
+      display:none;
+      position:absolute;top:100%;left:0;right:0;
+      flex-direction:column;align-items:stretch;gap:4px;
+      padding:10px 16px 16px;
+      background:var(--bg);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 20px 40px rgba(0,0,0,0.45);
+      max-height:calc(100vh - 64px);max-height:calc(100dvh - 64px);
+      overflow-y:auto;
+    }
+    .navbar.open .nav-links{display:flex;}
+    .nav-links button{
+      width:100%;text-align:left;font-size:16px;
+      padding:14px 16px;min-height:48px;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .navbar.open .nav-toggle span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .navbar.open .nav-toggle span:nth-child(2){opacity:0;}
+    .navbar.open .nav-toggle span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  }
+
+  /* ---------- Tablets & phones: layout ---------- */
+  @media (max-width:800px){
+    body{overflow-x:hidden;}
+    .container{padding:0 16px;}
+    section{padding:48px 0;}
+    h2{font-size:26px;}
+    .sub{font-size:16px;}
+    .grid-3{margin-top:28px;}
+    .grid-3, .grid-2{gap:16px;}
+    .card{padding:20px;}
+    .example-box{padding:20px;margin-top:24px;}
+    .page-header{padding:32px 0 8px;}
+    .price-tag{font-size:30px;}
+    .review-item, .concept-row > span:first-child, .history-item .topic{overflow-wrap:anywhere;}
+    .concept-row > span:first-child{min-width:0;}
+
+    .toast{
+      width:max-content;max-width:calc(100vw - 32px);
+      text-align:center;bottom:16px;
+    }
+  }
+
+  /* ---------- Phones ---------- */
+  @media (max-width:640px){
+    .hero{padding:44px 0 32px;}
+    .hero-actions{flex-direction:column;align-items:stretch;}
+    .hero-actions .btn{width:100%;}
+    .example-q{font-size:16px;overflow-wrap:anywhere;}
+    .footer, footer{padding:24px 0;}
+
+    .option-pill{padding:10px 16px;}
+    .error-banner{overflow-wrap:anywhere;}
+
+    /* Quiz */
+    .quiz-meta{flex-wrap:wrap;gap:4px 12px;}
+    #quiz-concept-label{text-align:right;overflow-wrap:anywhere;}
+    .question-card{margin-top:18px;}
+    .question-text{font-size:18px;margin-bottom:18px;overflow-wrap:anywhere;}
+    .choice-btn{padding:14px 16px;overflow-wrap:anywhere;}
+    .quiz-actions{gap:12px;margin-top:22px;}
+    .toggle-row{justify-content:space-between;}
+    .answer-feedback{padding:12px 14px;overflow-wrap:anywhere;}
+
+    /* Results */
+    .score-hero{padding:28px 0;}
+    .score-big{font-size:48px;}
+    .results-actions{flex-direction:column;align-items:stretch;margin:24px 0;}
+    .results-actions .btn{width:100%;}
+    .concept-row{flex-wrap:wrap;gap:8px 12px;padding:12px 14px;}
+    .review-item{padding:16px;}
+
+    /* Flashcards */
+    .flashcard-scene{height:280px;margin:24px 0;}
+    .flash-face{
+      padding:20px;font-size:17px;overflow-wrap:anywhere;overflow-y:auto;
+      align-items:center;align-items:safe center;
+    }
+    .flash-back{font-size:15px;}
+    .flash-controls{gap:8px;}
+    .flash-controls .btn{padding:11px 14px;}
+    .flash-index{min-width:56px;}
+
+    /* History */
+    .history-item{padding:14px 16px;}
+    .history-item > div:first-child{min-width:0;flex:1 1 200px;overflow-wrap:anywhere;}
+  }
+
+  @media (max-width:380px){
+    h1{font-size:30px;}
+    h2{font-size:24px;}
+    .container{padding:0 14px;}
+    .card{padding:16px;}
+    .logo{font-size:18px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <div class="logo" data-nav="landing"><span class="logo-mark">⚡</span>StudyForge</div>
+    <div class="nav-links" id="nav-links">
+      <button data-nav="dashboard">Dashboard</button>
+      <button data-nav="flashcards">Flashcards</button>
+      <button data-nav="history">History</button>
+      <button data-nav="pricing">Pricing</button>
+    </div>
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<!-- ============ LANDING ============ -->
+<div id="view-landing">
+  <div class="container">
+    <div class="hero">
+      <div class="eyebrow">AI-Powered Studying</div>
+      <h1>Turn your study material into<br>personalized practice.</h1>
+      <p class="sub">StudyForge transforms your notes, textbook excerpts, or topics into AI-generated quizzes and flashcards — then shows you exactly where to focus next.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" data-nav="dashboard">Start Studying</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See How It Works</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="how-it-works">
+    <div class="container">
+      <div class="eyebrow" style="text-align:center;display:block;">How It Works</div>
+      <h2 style="text-align:center;">Three steps to sharper studying</h2>
+      <div class="grid-3">
+        <div class="card step-card"><div class="step-num">1</div><h3>Add your material</h3><p style="color:var(--text-dim);font-size:14px;">Paste your notes, a textbook excerpt, or just a topic name.</p></div>
+        <div class="card step-card"><div class="step-num">2</div><h3>Generate personalized practice</h3><p style="color:var(--text-dim);font-size:14px;">AI builds a quiz matched to your material, difficulty, and format.</p></div>
+        <div class="card step-card"><div class="step-num">3</div><h3>Find and improve weak areas</h3><p style="color:var(--text-dim);font-size:14px;">See which concepts need work, then generate a focused follow-up quiz.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="eyebrow">Features</div>
+      <h2>Everything you need to study smarter</h2>
+      <div class="grid-3">
+        <div class="card feature-card"><div class="feature-icon">🧠</div><h3>AI Quiz Generation</h3><p>Real quizzes generated from your material by Gemini, not a random question bank.</p></div>
+        <div class="card feature-card"><div class="feature-icon">🗂️</div><h3>Smart Flashcards</h3><p>Flip-through flashcards generated from the same material you're studying.</p></div>
+        <div class="card feature-card"><div class="feature-icon">🎯</div><h3>Weakness Analysis</h3><p>See which concepts you got wrong, calculated from your actual answers.</p></div>
+        <div class="card feature-card"><div class="feature-icon">🔁</div><h3>Personalized Practice</h3><p>Generate a new quiz that targets exactly the concepts you struggled with.</p></div>
+        <div class="card feature-card"><div class="feature-icon">📜</div><h3>Quiz History</h3><p>Every past session is saved so you can track your progress over time.</p></div>
+        <div class="card feature-card"><div class="feature-icon">🔒</div><h3>Local Privacy</h3><p>Your quiz history stays in your browser — it's never sent to a server.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="eyebrow">Example</div>
+      <h2>What an AI-generated question looks like</h2>
+      <div class="example-box">
+        <span class="example-tag">Multiple Choice · Biology · Medium</span>
+        <div class="example-q">What is the primary product of the light-dependent reactions of photosynthesis?</div>
+        <div class="example-choice">Glucose</div>
+        <div class="example-choice correct">ATP and NADPH</div>
+        <div class="example-choice">Carbon dioxide</div>
+        <div class="example-choice">Water</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="eyebrow">FAQ</div>
+      <h2>Frequently asked questions</h2>
+      <div id="faq-list"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      StudyForge — study material and topics are sent to Gemini to generate quizzes and flashcards. Quiz history is stored only in your browser.
+    </div>
+  </footer>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="view-dashboard" class="hidden">
+  <div class="container">
+    <div class="page-header">
+      <h2>Study Dashboard</h2>
+      <p>Paste your material and configure your quiz.</p>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <label class="field-label" style="margin-top:0;">Study material or topic</label>
+      <textarea id="material-input" placeholder="Paste your notes, textbook excerpt, lesson summary, or topic here... e.g. &quot;Photosynthesis&quot; or &quot;These are my notes about cellular respiration...&quot;"></textarea>
+
+      <div class="config-card">
+        <label class="field-label">Number of questions</label>
+        <div class="option-row" id="opt-count">
+          <div class="option-pill" data-value="5">5</div>
+          <div class="option-pill selected" data-value="10">10</div>
+          <div class="option-pill" data-value="15">15</div>
+          <div class="option-pill" data-value="20">20</div>
+        </div>
+
+        <label class="field-label">Difficulty</label>
+        <div class="option-row" id="opt-difficulty">
+          <div class="option-pill" data-value="Easy">Easy</div>
+          <div class="option-pill selected" data-value="Medium">Medium</div>
+          <div class="option-pill" data-value="Hard">Hard</div>
+          <div class="option-pill" data-value="Mixed">Mixed</div>
+        </div>
+
+        <label class="field-label">Question types</label>
+        <div class="option-row" id="opt-types">
+          <div class="option-pill" data-value="multiple-choice">Multiple choice</div>
+          <div class="option-pill" data-value="true-false">True/False</div>
+          <div class="option-pill" data-value="short-answer">Short answer</div>
+          <div class="option-pill selected" data-value="mixed">Mixed</div>
+        </div>
+
+        <label class="field-label">Focus</label>
+        <div class="option-row" id="opt-focus">
+          <div class="option-pill selected" data-value="entire">Entire material</div>
+          <div class="option-pill" data-value="weak" id="focus-weak-pill">Weak areas</div>
+          <div class="option-pill" data-value="specific">Specific concept</div>
+        </div>
+        <div id="specific-concept-wrap" class="hidden" style="margin-top:12px;">
+          <input type="text" id="specific-concept-input" placeholder="e.g. Krebs cycle">
+        </div>
+      </div>
+
+      <div id="dashboard-error" class="hidden"></div>
+      <div style="margin-top:28px;">
+        <button class="btn btn-primary" id="generate-quiz-btn" onclick="Quiz.generate()">Generate Quiz</button>
+      </div>
+    </div>
+
+    <div id="dashboard-loading" class="hidden card loading-overlay" style="margin-top:20px;">
+      <div class="spinner"></div>
+      <p id="loading-text">Generating your quiz with AI...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QUIZ ============ -->
+<div id="view-quiz" class="hidden">
+  <div class="container">
+    <div class="quiz-wrap">
+      <div class="quiz-meta">
+        <span id="quiz-progress-label">Question 1 of 10</span>
+        <span id="quiz-concept-label"></span>
+      </div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="quiz-progress-fill" style="width:10%"></div></div>
+
+      <div class="card question-card">
+        <div class="question-text" id="question-text"></div>
+        <div id="choices-container"></div>
+        <div id="short-answer-container" class="hidden">
+          <input type="text" id="short-answer-input" placeholder="Type your answer..." autocomplete="off">
+        </div>
+        <div id="answer-feedback" class="hidden"></div>
+      </div>
+
+      <div class="toggle-row">
+        <span id="show-answer-label">Show correct answer after each question</span>
+        <label class="switch" for="show-answer-toggle">
+          <input type="checkbox" id="show-answer-toggle" aria-labelledby="show-answer-label">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn btn-ghost" onclick="Nav.show('dashboard')">Exit Quiz</button>
+        <button class="btn btn-primary" id="next-question-btn" onclick="Quiz.next()" disabled>Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div id="view-results" class="hidden">
+  <div class="container">
+    <div class="quiz-wrap">
+      <div class="score-hero">
+        <div class="eyebrow">Your Score</div>
+        <div class="score-big" id="score-fraction">8 / 10</div>
+        <div class="score-pct" id="score-percent">80%</div>
+        <p style="color:var(--text-faint);font-size:13px;margin-top:8px;" id="score-time"></p>
+      </div>
+
+      <div class="results-actions">
+        <button class="btn btn-primary" id="weak-practice-btn" onclick="Quiz.practiceWeakAreas()">Practice My Weak Areas</button>
+        <button class="btn btn-secondary" onclick="Nav.show('dashboard')">New Quiz</button>
+        <button class="btn btn-ghost" onclick="Nav.show('flashcards')">Try Flashcards</button>
+      </div>
+
+      <h2 style="font-size:20px;">Performance by concept</h2>
+      <div id="concept-breakdown"></div>
+
+      <h2 style="font-size:20px;margin-top:32px;">Review</h2>
+      <div id="results-review"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FLASHCARDS ============ -->
+<div id="view-flashcards" class="hidden">
+  <div class="container">
+    <div class="page-header">
+      <h2>Flashcards</h2>
+      <p>AI-generated flashcards from your study material.</p>
+    </div>
+
+    <div id="flashcard-setup" class="card" style="margin-top:20px;">
+      <label class="field-label" style="margin-top:0;">Study material or topic</label>
+      <textarea id="flashcard-material-input" placeholder="Paste your notes or a topic to generate flashcards from..."></textarea>
+      <div id="flashcard-error" class="hidden"></div>
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" onclick="Flashcards.generate()">Generate Flashcards</button>
+      </div>
+    </div>
+
+    <div id="flashcard-loading" class="hidden card loading-overlay" style="margin-top:20px;">
+      <div class="spinner"></div>
+      <p>Generating flashcards with AI...</p>
+    </div>
+
+    <div id="flashcard-viewer" class="hidden flash-wrap" style="margin-top:20px;">
+      <div class="flashcard-scene">
+        <div class="flashcard" id="flashcard-el" onclick="Flashcards.flip()">
+          <div class="flash-face flash-front" id="flash-front-text"></div>
+          <div class="flash-face flash-back" id="flash-back-text"></div>
+        </div>
+      </div>
+      <div class="flash-controls">
+        <button class="btn btn-secondary" onclick="Flashcards.prev()">‹ Previous</button>
+        <span class="flash-index" id="flash-index-label">1 / 10</span>
+        <button class="btn btn-secondary" onclick="Flashcards.next()">Next ›</button>
+      </div>
+      <div style="margin-top:20px;">
+        <button class="btn btn-ghost" onclick="Flashcards.reset()">Start Over</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HISTORY ============ -->
+<div id="view-history" class="hidden">
+  <div class="container">
+    <div class="page-header">
+      <h2>Quiz History</h2>
+      <p>Stored locally in your browser. Never sent to a server.</p>
+    </div>
+    <div id="history-list" style="margin-top:24px;"></div>
+  </div>
+</div>
+
+<!-- ============ PRICING ============ -->
+<div id="view-pricing" class="hidden">
+  <div class="container">
+    <div class="page-header" style="text-align:center;">
+      <h2>Pricing</h2>
+      <p>Payments are not connected yet — both tiers currently behave the same.</p>
+    </div>
+    <div class="grid-2" style="margin-top:32px;max-width:700px;margin-left:auto;margin-right:auto;">
+      <div class="card price-card">
+        <h3>Free</h3>
+        <div class="price-tag">$0<span>/month</span></div>
+        <ul class="price-list">
+          <li>✓ Limited quiz generation</li>
+          <li>✓ Flashcards</li>
+          <li>✓ Quiz history (local)</li>
+        </ul>
+        <button class="btn btn-secondary btn-block" data-nav="dashboard">Start Studying</button>
+      </div>
+      <div class="card price-card featured">
+        <h3>Pro</h3>
+        <div class="price-tag">$—<span>/month</span></div>
+        <ul class="price-list">
+          <li>✓ More generations</li>
+          <li>✓ Larger study materials</li>
+          <li>✓ Advanced weak-area practice</li>
+          <li>✓ More detailed analytics</li>
+        </ul>
+        <button class="btn btn-primary btn-block" disabled>Upgrade to Pro</button>
+        <span class="not-connected">⚠ Payments are not connected yet.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+/* =========================================================
+   GLOBAL ERROR HANDLING — never let the page go blank
+   ========================================================= */
+window.addEventListener('error', function(e){
+  console.error('Unexpected error:', e.error || e.message);
+  Toast.show('Something went wrong. Please try again.');
+});
+window.addEventListener('unhandledrejection', function(e){
+  console.error('Unhandled promise rejection:', e.reason);
+  Toast.show('Something went wrong. Please try again.');
+});
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+const Toast = {
+  show(msg, ms=3000){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    clearTimeout(this._t);
+    this._t = setTimeout(()=>el.classList.add('hidden'), ms);
+  }
+};
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+const Nav = {
+  views: ['landing','dashboard','quiz','results','flashcards','history','pricing'],
+  show(name){
+    if(!this.views.includes(name)) name = 'landing';
+    this.views.forEach(v=>{
+      document.getElementById('view-'+v).classList.toggle('hidden', v!==name);
+    });
+    document.querySelectorAll('.nav-links button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.nav===name);
+    });
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+    if(name==='history') History.render();
+    if(name==='dashboard') Quiz.syncWeakPillState();
+  }
+};
+document.querySelectorAll('[data-nav]').forEach(el=>{
+  el.addEventListener('click', ()=>Nav.show(el.dataset.nav));
+});
+
+/* Mobile menu (hamburger) */
+(function setupMobileMenu(){
+  const navbar = document.getElementById('navbar');
+  const toggle = document.getElementById('nav-toggle');
+  function setOpen(open){
+    navbar.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  }
+  toggle.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    setOpen(!navbar.classList.contains('open'));
+  });
+  // close after choosing a link, or when tapping anywhere outside the menu
+  document.addEventListener('click', (e)=>{
+    if(!navbar.classList.contains('open')) return;
+    if(!navbar.contains(e.target) || e.target.closest('.nav-links button') || e.target.closest('.logo')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && navbar.classList.contains('open')){ setOpen(false); toggle.focus(); }
+  });
+  // rotating the phone / resizing to desktop width: reset the menu
+  window.addEventListener('resize', ()=>{ if(window.innerWidth > 640) setOpen(false); });
+})();
+
+/* =========================================================
+   FAQ
+   ========================================================= */
+const FAQS = [
+  {q:'What material can I use?', a:'Paste raw notes, a textbook excerpt, a lesson summary, or just type a topic name like "Photosynthesis." StudyForge will generate a quiz based on whatever you provide.'},
+  {q:'How does AI generate the questions?', a:'Your material and quiz settings are sent to a backend endpoint, which forwards a structured prompt to the Gemini API. Gemini returns quiz questions in a structured format that StudyForge then displays.'},
+  {q:'Is my study history saved?', a:"Yes — your quiz history is saved in your browser's local storage. It is not uploaded anywhere and will be lost if you clear your browser data."},
+  {q:'Does StudyForge require an account?', a:'No. This version of StudyForge works without an account or login.'},
+  {q:'Is the AI included?', a:"StudyForge itself does not include a Gemini subscription. It requires a Gemini API key to be configured on the server it's deployed to."},
+];
+(function renderFaq(){
+  const list = document.getElementById('faq-list');
+  FAQS.forEach((f,i)=>{
+    const item = document.createElement('div');
+    item.className = 'faq-item';
+    item.innerHTML = `<div class="faq-q">${f.q}<span class="faq-arrow">▾</span></div><div class="faq-a">${f.a}</div>`;
+    item.querySelector('.faq-q').addEventListener('click', ()=>item.classList.toggle('open'));
+    list.appendChild(item);
+  });
+})();
+
+/* =========================================================
+   API COMMUNICATION LAYER
+   ========================================================= */
+const API = {
+  async generateQuiz(payload){
+    const res = await fetch('/api/generate-quiz', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>({error:'Invalid server response.'}));
+    if(!res.ok){
+      throw new Error(data.error || 'AI generation failed. Please check the server configuration and try again.');
+    }
+    return data;
+  },
+  async checkAnswer(payload){
+    const res = await fetch('/api/check-answer', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>({error:'Invalid server response.'}));
+    if(!res.ok){
+      throw new Error(data.error || 'Could not check your answer.');
+    }
+    if(typeof data.isCorrect !== 'boolean'){
+      throw new Error('Could not check your answer.');
+    }
+    return data.isCorrect;
+  },
+  async generateFlashcards(payload){
+    const res = await fetch('/api/generate-flashcards', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>({error:'Invalid server response.'}));
+    if(!res.ok){
+      throw new Error(data.error || 'AI generation failed. Please check the server configuration and try again.');
+    }
+    return data;
+  }
+};
+
+/* =========================================================
+   OPTION PILL SELECTION (dashboard config)
+   ========================================================= */
+function setupSingleSelectGroup(id){
+  const group = document.getElementById(id);
+  group.querySelectorAll('.option-pill').forEach(pill=>{
+    pill.addEventListener('click', ()=>{
+      group.querySelectorAll('.option-pill').forEach(p=>p.classList.remove('selected'));
+      pill.classList.add('selected');
+      if(id==='opt-focus'){
+        document.getElementById('specific-concept-wrap').classList.toggle('hidden', pill.dataset.value!=='specific');
+      }
+    });
+  });
+}
+['opt-count','opt-difficulty','opt-types','opt-focus'].forEach(setupSingleSelectGroup);
+
+function getSelected(id){
+  const sel = document.querySelector('#'+id+' .option-pill.selected');
+  return sel ? sel.dataset.value : null;
+}
+
+/* =========================================================
+   QUIZ STATE + ENGINE
+   ========================================================= */
+const Quiz = {
+  material: '',
+  questions: [],
+  currentIndex: 0,
+  answers: [], // {selected, correct, isCorrect, concept}
+  selectedChoice: null,
+  startTime: null,
+  lastWeakConcepts: [],
+  showAnswer: false,
+  reviewing: false,
+  checking: false,
+
+  syncWeakPillState(){
+    const pill = document.getElementById('focus-weak-pill');
+    const hasWeak = this.lastWeakConcepts.length > 0;
+    pill.style.opacity = hasWeak ? '1' : '0.5';
+  },
+
+  showDashboardError(msg){
+    const el = document.getElementById('dashboard-error');
+    el.className = 'error-banner';
+    el.textContent = '⚠ ' + msg;
+  },
+  clearDashboardError(){
+    const el = document.getElementById('dashboard-error');
+    el.className = 'hidden';
+  },
+
+  async generate(){
+    this.clearDashboardError();
+    const material = document.getElementById('material-input').value.trim();
+    const focus = getSelected('opt-focus');
+
+    if(!material && focus !== 'weak'){
+      this.showDashboardError('Please enter some study material or a topic before generating a quiz.');
+      return;
+    }
+    if(focus === 'weak' && this.lastWeakConcepts.length === 0){
+      this.showDashboardError('No weak areas found yet. Complete a quiz first, then use "Practice My Weak Areas" from your results.');
+      return;
+    }
+
+    const config = {
+      numQuestions: parseInt(getSelected('opt-count'), 10),
+      difficulty: getSelected('opt-difficulty'),
+      questionType: getSelected('opt-types'),
+      focus: focus,
+      specificConcept: focus === 'specific' ? document.getElementById('specific-concept-input').value.trim() : null,
+      weakConcepts: focus === 'weak' ? this.lastWeakConcepts : []
+    };
+
+    if(focus === 'specific' && !config.specificConcept){
+      this.showDashboardError('Please enter the specific concept you want to focus on.');
+      return;
+    }
+
+    this.material = material;
+    this.setLoading(true, 'Generating your quiz with AI...');
+    try{
+      const data = await API.generateQuiz({ material, config });
+      const questions = this.validateQuizResponse(data);
+      this.startQuiz(questions, material);
+    }catch(err){
+      console.error(err);
+      this.showDashboardError(err.message || 'AI generation failed. Please check the server configuration and try again.');
+    }finally{
+      this.setLoading(false);
+    }
+  },
+
+  validateQuizResponse(data){
+    if(!data || !Array.isArray(data.questions) || data.questions.length === 0){
+      throw new Error('The AI response was invalid or empty. Please try again.');
+    }
+    const cleaned = [];
+    for(const q of data.questions){
+      if(!q || typeof q.question !== 'string' || !q.question.trim()) continue;
+      const type = ['multiple-choice','true-false','short-answer'].includes(q.type) ? q.type : 'short-answer';
+      const item = {
+        question: q.question.trim(),
+        type,
+        choices: Array.isArray(q.choices) ? q.choices.filter(c=>typeof c==='string') : null,
+        correctAnswer: typeof q.correctAnswer === 'string' ? q.correctAnswer : String(q.correctAnswer || ''),
+        explanation: typeof q.explanation === 'string' ? q.explanation : '',
+        concept: typeof q.concept === 'string' && q.concept.trim() ? q.concept.trim() : 'General'
+      };
+      if(type === 'multiple-choice' && (!item.choices || item.choices.length < 2)) continue;
+      cleaned.push(item);
+    }
+    if(cleaned.length === 0){
+      throw new Error('The AI returned questions in an unexpected format. Please try again.');
+    }
+    return cleaned;
+  },
+
+  setLoading(isLoading, text){
+    document.getElementById('dashboard-loading').classList.toggle('hidden', !isLoading);
+    document.getElementById('generate-quiz-btn').disabled = isLoading;
+    if(text) document.getElementById('loading-text').textContent = text;
+  },
+
+  startQuiz(questions, material){
+    this.questions = questions;
+    this.material = material;
+    this.currentIndex = 0;
+    this.answers = [];
+    this.startTime = Date.now();
+    Nav.show('quiz');
+    this.renderQuestion();
+  },
+
+  renderQuestion(){
+    const q = this.questions[this.currentIndex];
+    this.selectedChoice = null;
+    this.reviewing = false;
+    this.checking = false;
+    this.clearFeedback();
+
+    document.getElementById('quiz-progress-label').textContent =
+      `Question ${this.currentIndex+1} of ${this.questions.length}`;
+    document.getElementById('quiz-concept-label').textContent = q.concept;
+    document.getElementById('quiz-progress-fill').style.width =
+      `${((this.currentIndex)/this.questions.length)*100 + (100/this.questions.length)}%`;
+    document.getElementById('question-text').textContent = q.question;
+    document.getElementById('next-question-btn').disabled = true;
+    document.getElementById('next-question-btn').textContent =
+      this.currentIndex === this.questions.length-1 ? 'See Results' : 'Next';
+
+    const choicesEl = document.getElementById('choices-container');
+    const shortEl = document.getElementById('short-answer-container');
+    document.getElementById('short-answer-input').value = '';
+    document.getElementById('short-answer-input').disabled = false;
+    choicesEl.innerHTML = '';
+
+    if(q.type === 'multiple-choice' || q.type === 'true-false'){
+      shortEl.classList.add('hidden');
+      choicesEl.classList.remove('hidden');
+      const choices = q.type === 'true-false' ? ['True','False'] : q.choices;
+      choices.forEach(choice=>{
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = choice;
+        btn.onclick = ()=>this.selectChoice(choice, btn);
+        choicesEl.appendChild(btn);
+      });
+    } else {
+      choicesEl.classList.add('hidden');
+      shortEl.classList.remove('hidden');
+    }
+  },
+
+  selectChoice(choice, btnEl){
+    document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+    btnEl.classList.add('selected');
+    this.selectedChoice = choice;
+    document.getElementById('next-question-btn').disabled = false;
+  },
+
+  onShortAnswerInput(){
+    if(this.reviewing || this.checking) return;
+    const val = document.getElementById('short-answer-input').value.trim();
+    document.getElementById('next-question-btn').disabled = !val;
+  },
+
+  recordAnswer(selected, isCorrect, q){
+    this.answers.push({
+      question: q.question,
+      selected,
+      correctAnswer: q.correctAnswer,
+      isCorrect,
+      explanation: q.explanation,
+      concept: q.concept
+    });
+  },
+
+  nextLabel(){
+    return this.currentIndex === this.questions.length-1 ? 'See Results' : 'Next';
+  },
+
+  setChecking(isChecking){
+    this.checking = isChecking;
+    const btn = document.getElementById('next-question-btn');
+    document.getElementById('short-answer-input').disabled = isChecking;
+    btn.disabled = isChecking;
+    btn.textContent = isChecking ? 'Checking...' : this.nextLabel();
+  },
+
+  clearFeedback(){
+    const el = document.getElementById('answer-feedback');
+    el.className = 'hidden';
+    el.innerHTML = '';
+  },
+
+  showCheckError(msg){
+    const el = document.getElementById('answer-feedback');
+    el.className = 'answer-feedback error';
+    el.textContent = '⚠ ' + msg + ' Click Next to try again.';
+  },
+
+  showFeedback(q, selected, isCorrect){
+    const el = document.getElementById('answer-feedback');
+    el.className = 'answer-feedback ' + (isCorrect ? 'correct' : 'incorrect');
+    el.innerHTML = '';
+    const addLine = (cls, label, value)=>{
+      const d = document.createElement('div');
+      d.className = cls;
+      if(label){
+        d.appendChild(document.createTextNode(label + ' '));
+        const b = document.createElement('b');
+        b.textContent = value;
+        d.appendChild(b);
+      } else {
+        d.textContent = value;
+      }
+      el.appendChild(d);
+    };
+    addLine('fb-title', null, isCorrect ? '✓ Correct' : '✗ Incorrect');
+    addLine('fb-line', 'Correct answer:', q.correctAnswer);
+    if(q.explanation) addLine('fb-line', null, q.explanation);
+
+    if(q.type !== 'short-answer'){
+      document.querySelectorAll('.choice-btn').forEach(b=>{
+        b.disabled = true;
+        b.classList.remove('selected');
+        if(this.normalize(b.textContent) === this.normalize(q.correctAnswer)) b.classList.add('correct');
+        else if(!isCorrect && b.textContent === selected) b.classList.add('incorrect');
+      });
+    }
+  },
+
+  advance(){
+    if(this.currentIndex < this.questions.length - 1){
+      this.currentIndex++;
+      this.renderQuestion();
+    } else {
+      this.finish();
+    }
+  },
+
+  async next(){
+    if(this.checking) return;
+
+    // Feedback is on screen (Show answer = ON): this click just moves on.
+    if(this.reviewing){
+      this.advance();
+      return;
+    }
+
+    const q = this.questions[this.currentIndex];
+    const idx = this.currentIndex;
+    let selected, isCorrect;
+
+    if(q.type !== 'short-answer'){
+      if(this.selectedChoice === null) return;
+      selected = this.selectedChoice;
+      isCorrect = this.normalize(selected) === this.normalize(q.correctAnswer);
+    } else {
+      selected = document.getElementById('short-answer-input').value.trim();
+      if(!selected) return;
+      this.clearFeedback();
+      this.setChecking(true);
+      try{
+        isCorrect = await API.checkAnswer({
+          question: q.question,
+          correctAnswer: q.correctAnswer,
+          userAnswer: selected
+        });
+      }catch(err){
+        console.error(err);
+        this.setChecking(false);
+        this.showCheckError(err.message || 'Could not check your answer.');
+        return;
+      }
+      // user left the quiz or the question changed while waiting
+      if(this.currentIndex !== idx || document.getElementById('view-quiz').classList.contains('hidden')){
+        this.checking = false;
+        return;
+      }
+      this.setChecking(false);
+    }
+
+    this.recordAnswer(selected, isCorrect, q);
+
+    if(this.showAnswer){
+      this.reviewing = true;
+      document.getElementById('short-answer-input').disabled = true;
+      this.showFeedback(q, selected, isCorrect);
+      document.getElementById('next-question-btn').disabled = false;
+    } else {
+      this.advance();
+    }
+  },
+
+  normalize(s){
+    return String(s||'').trim().toLowerCase();
+  },
+
+  finish(){
+    const total = this.questions.length;
+    const correct = this.answers.filter(a=>a.isCorrect).length;
+    const pct = Math.round((correct/total)*100);
+    const timeSpentSec = Math.round((Date.now() - this.startTime)/1000);
+
+    const conceptStats = {};
+    this.answers.forEach(a=>{
+      if(!conceptStats[a.concept]) conceptStats[a.concept] = {correct:0, total:0};
+      conceptStats[a.concept].total++;
+      if(a.isCorrect) conceptStats[a.concept].correct++;
+    });
+    const weakConcepts = Object.entries(conceptStats)
+      .filter(([_,s])=> s.correct / s.total < 0.6)
+      .map(([c])=>c);
+    this.lastWeakConcepts = weakConcepts;
+
+    History.save({
+      date: new Date().toISOString(),
+      topic: this.material.slice(0,60) || 'Untitled material',
+      score: correct,
+      totalQuestions: total,
+      percentage: pct,
+      weakConcepts
+    });
+
+    this.renderResults(correct, total, pct, timeSpentSec, conceptStats);
+    Nav.show('results');
+  },
+
+  renderResults(correct, total, pct, timeSpentSec, conceptStats){
+    document.getElementById('score-fraction').textContent = `${correct} / ${total}`;
+    document.getElementById('score-percent').textContent = `${pct}%`;
+    const mins = Math.floor(timeSpentSec/60), secs = timeSpentSec%60;
+    document.getElementById('score-time').textContent = `Time spent: ${mins}m ${secs}s`;
+
+    const breakdown = document.getElementById('concept-breakdown');
+    breakdown.innerHTML = '';
+    Object.entries(conceptStats).forEach(([concept, s])=>{
+      const isStrong = s.correct / s.total >= 0.6;
+      const row = document.createElement('div');
+      row.className = 'concept-row';
+      row.innerHTML = `<span>${concept}</span><span class="concept-tag ${isStrong?'strong':'weak'}">${isStrong?'Strong':'Needs practice'} · ${s.correct}/${s.total}</span>`;
+      breakdown.appendChild(row);
+    });
+
+    const weakBtn = document.getElementById('weak-practice-btn');
+    weakBtn.disabled = this.lastWeakConcepts.length === 0;
+    weakBtn.textContent = this.lastWeakConcepts.length === 0
+      ? 'No Weak Areas Found'
+      : 'Practice My Weak Areas';
+
+    const review = document.getElementById('results-review');
+    review.innerHTML = '';
+    this.answers.forEach((a,i)=>{
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <span class="badge ${a.isCorrect?'correct':'incorrect'}">${a.isCorrect?'Correct':'Incorrect'}</span>
+        <div style="font-weight:600;">${i+1}. ${a.question}</div>
+        <div class="ans-line">Your answer: <b>${a.selected || '(none)'}</b></div>
+        <div class="ans-line">Correct answer: <b>${a.correctAnswer}</b></div>
+        <div class="ans-line">Concept: <b>${a.concept}</b></div>
+        ${a.explanation ? `<div class="explain">${a.explanation}</div>` : ''}
+      `;
+      review.appendChild(div);
+    });
+  },
+
+  async practiceWeakAreas(){
+    if(this.lastWeakConcepts.length === 0) return;
+    this.setLoading(true);
+    Nav.show('dashboard');
+    document.getElementById('material-input').value = this.material;
+    this.setLoading(true, 'Generating a focused quiz on your weak areas...');
+    try{
+      const config = {
+        numQuestions: 10,
+        difficulty: 'Mixed',
+        questionType: 'mixed',
+        focus: 'weak',
+        specificConcept: null,
+        weakConcepts: this.lastWeakConcepts
+      };
+      const data = await API.generateQuiz({ material: this.material, config });
+      const questions = this.validateQuizResponse(data);
+      this.startQuiz(questions, this.material);
+    }catch(err){
+      console.error(err);
+      this.showDashboardError(err.message || 'AI generation failed. Please check the server configuration and try again.');
+    }finally{
+      this.setLoading(false);
+    }
+  }
+};
+
+document.getElementById('short-answer-input').addEventListener('input', ()=>Quiz.onShortAnswerInput());
+document.getElementById('short-answer-input').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    if(!document.getElementById('next-question-btn').disabled) Quiz.next();
+  }
+});
+
+// "Show correct answer after each question" switch (remembered in this browser)
+(function setupShowAnswerToggle(){
+  const toggle = document.getElementById('show-answer-toggle');
+  try{ Quiz.showAnswer = localStorage.getItem('studyforge_show_answer') === '1'; }catch(e){}
+  toggle.checked = Quiz.showAnswer;
+  toggle.addEventListener('change', ()=>{
+    Quiz.showAnswer = toggle.checked;
+    try{ localStorage.setItem('studyforge_show_answer', toggle.checked ? '1' : '0'); }catch(e){}
+  });
+})();
+
+/* =========================================================
+   FLASHCARDS
+   ========================================================= */
+const Flashcards = {
+  cards: [],
+  index: 0,
+  flipped: false,
+
+  showError(msg){
+    const el = document.getElementById('flashcard-error');
+    el.className = 'error-banner';
+    el.textContent = '⚠ ' + msg;
+  },
+  clearError(){
+    document.getElementById('flashcard-error').className = 'hidden';
+  },
+
+  async generate(){
+    this.clearError();
+    const material = document.getElementById('flashcard-material-input').value.trim();
+    if(!material){
+      this.showError('Please enter study material or a topic to generate flashcards from.');
+      return;
+    }
+    document.getElementById('flashcard-loading').classList.remove('hidden');
+    document.getElementById('flashcard-setup').classList.add('hidden');
+    try{
+      const data = await API.generateFlashcards({ material });
+      const cards = this.validate(data);
+      this.cards = cards;
+      this.index = 0;
+      this.flipped = false;
+      document.getElementById('flashcard-loading').classList.add('hidden');
+      document.getElementById('flashcard-viewer').classList.remove('hidden');
+      this.render();
+    }catch(err){
+      console.error(err);
+      document.getElementById('flashcard-loading').classList.add('hidden');
+      document.getElementById('flashcard-setup').classList.remove('hidden');
+      this.showError(err.message || 'AI generation failed. Please check the server configuration and try again.');
+    }
+  },
+
+  validate(data){
+    if(!data || !Array.isArray(data.cards) || data.cards.length === 0){
+      throw new Error('The AI response was invalid or empty. Please try again.');
+    }
+    const cleaned = data.cards
+      .filter(c=>c && typeof c.front === 'string' && typeof c.back === 'string')
+      .map(c=>({front:c.front.trim(), back:c.back.trim()}));
+    if(cleaned.length === 0){
+      throw new Error('The AI returned flashcards in an unexpected format. Please try again.');
+    }
+    return cleaned;
+  },
+
+  render(){
+    const card = this.cards[this.index];
+    document.getElementById('flash-front-text').textContent = card.front;
+    document.getElementById('flash-back-text').textContent = card.back;
+    document.getElementById('flash-index-label').textContent = `${this.index+1} / ${this.cards.length}`;
+    document.getElementById('flashcard-el').classList.remove('flipped');
+    this.flipped = false;
+  },
+
+  flip(){
+    this.flipped = !this.flipped;
+    document.getElementById('flashcard-el').classList.toggle('flipped', this.flipped);
+  },
+
+  next(){
+    this.index = (this.index + 1) % this.cards.length;
+    this.render();
+  },
+  prev(){
+    this.index = (this.index - 1 + this.cards.length) % this.cards.length;
+    this.render();
+  },
+  reset(){
+    document.getElementById('flashcard-viewer').classList.add('hidden');
+    document.getElementById('flashcard-setup').classList.remove('hidden');
+    document.getElementById('flashcard-material-input').value = '';
+    this.clearError();
+  }
+};
+
+/* =========================================================
+   HISTORY (localStorage)
+   ========================================================= */
+const History = {
+  KEY: 'studyforge_history',
+
+  load(){
+    try{
+      const raw = localStorage.getItem(this.KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      console.error('Failed to read history from localStorage', e);
+      return [];
+    }
+  },
+
+  save(entry){
+    try{
+      const items = this.load();
+      items.unshift(entry);
+      localStorage.setItem(this.KEY, JSON.stringify(items.slice(0,100)));
+    }catch(e){
+      console.error('Failed to save history to localStorage', e);
+      Toast.show('Could not save quiz history in this browser.');
+    }
+  },
+
+  render(){
+    const items = this.load();
+    const list = document.getElementById('history-list');
+    if(items.length === 0){
+      list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No quiz history yet. Complete a quiz to see it here.</p></div>`;
+      return;
+    }
+    list.innerHTML = '';
+    items.forEach(item=>{
+      const d = new Date(item.date);
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML = `
+        <div>
+          <div class="topic">${item.topic}</div>
+          <div class="date">${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · ${item.totalQuestions} questions${item.weakConcepts && item.weakConcepts.length ? ' · Weak: '+item.weakConcepts.join(', ') : ''}</div>
+        </div>
+        <div class="history-score">${item.score}/${item.totalQuestions} <span style="color:var(--text-faint);font-size:13px;">(${item.percentage}%)</span></div>
+      `;
+      list.appendChild(div);
+    });
+  }
+};
+
+/* =========================================================
+   INIT
+   ========================================================= */
+Nav.show('landing');
+</script>
+</body>
+</html>
